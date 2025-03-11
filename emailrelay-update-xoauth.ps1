@@ -10,7 +10,7 @@
 
 # Configuration 
 $authFile = 'C:\ProgramData\E-MailRelay\emailrelay.auth'	### Put your Auth files paht from the emailrelay here
-$username = ''				    			### Put your E-Mail here
+$username = ''				    			### Put your Username here
 $tenantId = '' 		    					### Paste your tenant ID here
 $appId = '' 		    					### Paste your Application ID here
 $appSecret = '' 						### Paste your Application key here
