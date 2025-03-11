@@ -1,22 +1,38 @@
-#
-# E-MailRelay - Get token from Microsoft 365 and update at in the E-MailRelay auth config
-#
-# Authors:
-# - b.stromberg@data-systems.de
-# - j.saslona@data-systems.de (Github: Jon1Games)
-#
-
-# Paste your config file path, Username, Tenant ID, App ID, and App Secret (App key) into the indicated quotes below.
+<#
+.SYNOPSIS
+    Updates the E-Mailrelay auth config file with [Microsft] SASL XOAuth2 token(s) for Exchange Online
+.DESCRIPTION
+    Takes TenantID, AppID and AppSecret of a Microsoft 365 AzureAD-Application ("Entra App"),
+    generates the Grpah access token for it, generates a SASL XAUTH2 Access Token from that and
+    updates the E-MailRelay auth config file with the new token. All while E-MailRelay is running.
+    This script is intended to be run as a scheduled task to keep the E-MailRelay auth config file up-to-date.
+.PARAMETER <Parameter_Name>
+    No command line parameters
+.EXAMPLE
+    .\emailrelay-update-xoauth.ps1
+    This will update the E-MailRelay auth config file with a new SASL XOAuth2 token.
+.INPUTS
+  None
+.OUTPUTS
+  None
+.NOTES
+  Version:        0.8
+  Author:         b.stromberg@data-systems.de (Github: weed-), j.saslona@data-systems.de (Github: Jon1Games)
+  Creation Date:  2025-03-11
+  Change:         -Initial script development
+                  - Added TenantID, AppID and AppSecret as parameters
+                  - Stole stuff from https://learn.microsoft.com/de-de/entra/global-secure-access/scripts/powershell-get-token
+#>
 
 # Configuration 
-$authFile = 'C:\ProgramData\E-MailRelay\emailrelay.auth'	### Put your Auth files paht from the emailrelay here
-$username = ''				    			### Put your Username here
-$tenantId = '' 		    					### Paste your tenant ID here
-$appId = '' 		    					### Paste your Application ID here
-$appSecret = '' 						### Paste your Application key here
-$sourceAppIdUri = 'https://outlook.office365.com/.default' 	# Scope
+$authFile = 'C:\ProgramData\E-MailRelay\emailrelay.auth'	### Put your (full) E-Mailrelay Auth file path here
+$username = ''				    			### Put your Username (UPN) here, like "bob@example.com"
+$tenantId = '' 		    					### Paste your tenant ID here, like "12345678-1234-1234-1234-123456789012"
+$appId = '' 		    					### Paste your Application ID here, like "12345678-1234-1234-1234-123456789012"
+$appSecret = '' 						    ### Paste your Application Secret (key) here, like "_ew1849n~2as#+a.33"
+$sourceAppIdUri = 'https://outlook.office365.com/.default' 	# Paste your scope URL here, like "https://outlook.office365.com/.default" (Exchange Online)
 
-# Get new token
+# Get new access token
 $oAuthUri = "https://login.microsoftonline.com/$TenantId/oauth2/v2.0/token"
 $authBody = [Ordered] @{
     scope = "$sourceAppIdUri"
