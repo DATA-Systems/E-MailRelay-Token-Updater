@@ -48,7 +48,7 @@ $saslXOAuth2Bytes = [System.Text.Encoding]::Unicode.GetBytes("user=$username^Aau
 $saslXOAuth2 = [Convert]::ToBase64String($saslXOAuth2Bytes)
 
 # Replace old token
-$emailrelayAuth = "Client oauth:b $saslXOAuth2"
+$emailrelayAuth = "client oauth:b $appId $saslXOAuth2"
 $line = Get-Content $authFile | Select-String oauth:b | Select-Object -ExpandProperty Line
 if ($line -eq $null) {
     Out-File -append -FilePath $authFile -InputObject $emailrelayAuth
