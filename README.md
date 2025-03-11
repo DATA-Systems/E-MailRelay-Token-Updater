@@ -1,2 +1,2 @@
 # E-MailRelay-Token-Updater
-A script to update the OAuth token needed for the [E-mailRelay](https://emailrelay.sourceforge.net/).
+A script to get and update the OAuth token from Microsoft 365 at the [E-mailRelay](https://emailrelay.sourceforge.net/) auth config.
