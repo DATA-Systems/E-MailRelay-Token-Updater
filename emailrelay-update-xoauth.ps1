@@ -49,12 +49,12 @@ $saslXOAuth2 = [Convert]::ToBase64String($saslXOAuth2Bytes)
 
 # Replace old token
 $emailrelayAuth = "Client oauth:b $saslXOAuth2"
-$content = Get-Content $authFile
-if (Get-Content $authFile | %{$_ -match "Client oauth:b *"}) {
-	$content = $content -replace "Client oauth:b *", $emailrelayAuth
-	$content | Set-Content $authFile
-	Write-Host "XOAuth base 64 token was replaced in $authFile."
-} else {
+$line = Get-Content $authFile | Select-String oauth:b | Select-Object -ExpandProperty Line
+if ($line -eq $null) {
     Out-File -append -FilePath $authFile -InputObject $emailrelayAuth
     Write-Host "XOAuth base 64 token was appended to the file $authFile."
+} else {
+    $content = Get-Content $authFile
+    $content | ForEach-Object {$_ -replace $line,$emailrelayAuth} | Set-Content $authFile
+	Write-Host "XOAuth base 64 token was replaced in $authFile."
 }
