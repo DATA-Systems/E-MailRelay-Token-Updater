@@ -9,11 +9,11 @@
 # Paste your config file path, Username, Tenant ID, App ID, and App Secret (App key) into the indicated quotes below.
 
 # Configuration 
-$authFile = "C:\Users\JonasSaslona\Desktop\test.txt"	    ### Put your Auth files paht from the emailrelay here # default: C:\ProgramData\E-MailRelay\emailrelay.auth
-$username = 'beda-system@beda.com'				            ### Put your E-Mail here
-$tenantId = 'bb8c1c38-2b5f-4745-9fa0-9741f4c2413e' 		    ### Paste your tenant ID here
-$appId = '87d1f02d-e331-45ab-ba0c-9eb975986c06' 		    ### Paste your Application ID here
-$appSecret = 'TyU8Q~_2F_9XpemfuyJxW6K.Fow9a95FvL.qEchj' 	### Paste your Application key here
+$authFile = 'C:\ProgramData\E-MailRelay\emailrelay.auth'	### Put your Auth files paht from the emailrelay here
+$username = ''				    			### Put your E-Mail here
+$tenantId = '' 		    					### Paste your tenant ID here
+$appId = '' 		    					### Paste your Application ID here
+$appSecret = '' 						### Paste your Application key here
 $sourceAppIdUri = 'https://outlook.office365.com/.default' 	# Scope
 
 # Get new token
