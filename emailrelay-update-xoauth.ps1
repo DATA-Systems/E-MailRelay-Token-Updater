@@ -44,7 +44,7 @@ $authResponse = Invoke-RestMethod -Method Post -Uri $oAuthUri -Body $authBody -E
 $token = $authResponse.access_token
 
 # Convert toke to SASL XOauth2 format
-$saslXOAuth2Bytes = [System.Text.Encoding]::Unicode.GetBytes("user=$username^Aauth=Bearer $token^A^A")
+$saslXOAuth2Bytes = [System.Text.Encoding]::UTF8.GetBytes("user=$username^Aauth=Bearer $token^A^A")
 $saslXOAuth2 = [Convert]::ToBase64String($saslXOAuth2Bytes)
 
 # Replace old token
