@@ -4,9 +4,13 @@ A script to get and update the OAuth token from Microsoft 365 at the [E-MailRela
 
 ## Usage
 
-### Create Microsoft Application
+### Microsoft
 
-coming soon
+#### Create Microsoft Application
+
+cooming soon
+
+#### Create Microsoft service principal
 
 ### Script
 
