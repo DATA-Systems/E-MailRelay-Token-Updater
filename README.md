@@ -6,20 +6,12 @@ A script to get and update the OAuth token from Microsoft 365 at the [E-MailRela
 
 ### Microsoft
 
-To disconnect later you need this command
-```powershell
-```
-
 #### Create Microsoft Application
 
-*not complete*
-```powershell
-New-App -OrganizationApp
-```
+cooming soon
 
 #### Create Microsoft service principal
 
-*not complete*
 ```
 # Install the module, can be skipped if already installed
 Import-Module ExchangeOnlineManagement
@@ -27,10 +19,10 @@ Import-Module ExchangeOnlineManagement
 # Will open your web-browser where you need to login.
 Connect-ExchangeOnline
 
-
-New-ServicePrincipal -appid <> -objectid <> -DisplayName <name>
+# ID´s found at entry > Applications > Organisation Applications > APP
+New-ServicePrincipal -appid <appId> -objectid <objectId> -DisplayName <name>
 Get-ServicePrincipal | fl
-Add-MailboxPermission -identity <username(UPN)> -user <> -accessrights <Fullacces|>
+Add-MailboxPermission -identity <username(UPN)> -user <appId> -accessrights <Fullacces>
 
 # Disconnect
 Disconnect-ExchangeOnline
