@@ -11,7 +11,7 @@ As we will do both the Application and Service-Principal creating in the Exchang
 # Install the module, can be skipped if already installed
 Import-Module ExchangeOnlineManagement
 
-# Will open yout web-browser where you need to login.
+# Will open your web-browser where you need to login.
 Connect-ExchangeOnline
 ```
 
