@@ -67,3 +67,5 @@ if ($line -eq $null) {
     $content | ForEach-Object {$_ -replace $line,$emailrelayAuthConfig} | Set-Content $AuthFile
     Write-Host "XOAuth base 64 token was replaced in $AuthFile."
 }
+
+exit
