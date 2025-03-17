@@ -29,6 +29,6 @@ job should run emailrelay-update-xoauth.ps1 about every 30-45 Minutes as the tok
 Admin commandline
 
 ```bash
-schtasks /create /sc MINUTE /mo 30  /ru System /rl HIGHEST /tn Update-XOauth-Token /tr "powershell.exe -File '<path to emailrelay-update-xoauth.ps1>'"
+schtasks /create /sc MINUTE /mo 30 /ru System /rl HIGHEST /tn Update-XOauth-Token /tr "powershell.exe -File '<path to emailrelay-update-xoauth.ps1>'"
 schtasks /run /tn Update-XOauth-Token
 ```
