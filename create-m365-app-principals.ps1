@@ -40,6 +40,7 @@ Import-Module Microsoft.Entra
 Import-Module ExchangeOnlineManagement
 
 # Comnnect to graph and ExchangeOnline
+Write-Host "Connect to MgGraph and ExchangeOnline"
 $scopes = @(
     "Application.Read.All"
     "Application.ReadWrite.All"
@@ -49,7 +50,7 @@ Connect-MgGraph -Scopes $scopes -NoWelcome
 Connect-ExchangeOnline
 
 # Some configuration
-$appName = "E-MailRelay-Test"
+$appName = "E-MailRelay"
 
 # Create APP
 $App = New-MgApplication -DisplayName $AppName
@@ -82,7 +83,7 @@ Write-host "Set Permissions"
 New-EntraServicePrincipalAppRoleAssignment -ObjectId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -PrincipalId $servicePrincipal.Id | Out-Null
 
 # Add app secret
-$endDate = (Get-Date).AddMonths(+12)
+$endDate = (Get-Date).AddMonths(+121)
 $passwordCred = @{
     "displayName" = $appName
     "endDateTime" = $endDate

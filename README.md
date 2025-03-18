@@ -21,7 +21,8 @@ We recommend using `.\create-m365-app-principals.ps1` to create the App (with le
 Login with your Microsoft 365 Administrator when asked to to so. This ensues the "least privilege" setup and sets the [admin consent](https://learn.microsoft.com/en-us/entra/identity/enterprise-apps/grant-admin-consent) flag for your new application. You will be prompted (at least) two times, depending on your Microsoft 365 tenants security setings. This is expected.
 
 ### 3. Backup/Paste credentials
-`create-m365-app-principals.ps1` will output your new App's credentials, namely "AppID" and "AppSecret" ⚠️ Backup both to a safe place.
+`create-m365-app-principals.ps1` will output your new App's credentials, namely "AppID" and "AppSecret" and "TenantID" ⚠️ Backup them to a safe place.
+⚠️ The AppSecret has a livetime of 121 Moths (1 year with 1 month of spare time) ⚠️
 
 Edit `emailrelay-update-xoauth.ps1` using notepad or your editor of choice and paste those values. Make sure the (changed) script is in a safe place and has appropriate ACLs.
 
