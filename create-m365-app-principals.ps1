@@ -88,12 +88,11 @@ $passwordCred = @{
     "endDateTime" = $endDate
 }
 Write-host "Create client secret, expiration: $endDate"
-$ClientSecret2 = Add-MgApplicationPassword -ApplicationId $APPObjectID -PasswordCredential $passwordCred | Out-Null
+$ClientSecret2 = Add-MgApplicationPassword -ApplicationId $APPObjectID -PasswordCredential $passwordCred
 $secret = $ClientSecret2.SecretText
 
 #Show ClientSecrets
 $App = Get-MgApplication -ApplicationId $APPObjectID
-$App.PasswordCredentials
 
 $registered = $false
 while ($registered -eq $false) {
