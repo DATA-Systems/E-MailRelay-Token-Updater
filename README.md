@@ -22,7 +22,7 @@ Login with your Microsoft 365 Administrator when asked to to so. This ensues the
 
 ### 3. Backup/Paste credentials
 `create-m365-app-principals.ps1` will output your new App's credentials, namely "AppID" and "AppSecret" and "TenantID" ⚠️ Backup them to a safe place.<br>
-⚠️ The AppSecret has a livetime of 121 Moths (1 year with 1 month of spare time) ⚠️
+⚠️ The AppSecret has a livetime of 121 Months⚠️
 
 Edit `emailrelay-update-xoauth.ps1` using notepad or your editor of choice and paste those values. Make sure the (changed) script is in a safe place and has appropriate ACLs.
 
