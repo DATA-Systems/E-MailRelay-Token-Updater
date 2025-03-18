@@ -54,7 +54,7 @@ This can be done with two simple lines at the (Run-As-Administrator) command lin
 
 ## Thank you
 
-We set this up because [E-MailRelay](https://emailrelay.sourceforge.net/) is our SNMTP relay of choice, since Microsoft [dropped the SMTP services in Windows Server 2025](https://learn.microsoft.com/en-us/windows-server/get-started/removed-deprecated-features-windows-server). We are planning to use (and support) these scripts, as long as needed. We will gladly read (and most likely accept) PRs for patches, improvements and updates.
+We set this up because [E-MailRelay](https://emailrelay.sourceforge.net/) is our SMTP relay of choice, since Microsoft [dropped the SMTP services in Windows Server 2025](https://learn.microsoft.com/en-us/windows-server/get-started/removed-deprecated-features-windows-server). We are planning to use (and support) these scripts, as long as needed. We will gladly read (and most likely accept) PRs for patches, improvements and updates.
 
 Thanks to the admins of [ugg.li](https://ugg.li) for their very friendly help and guidance and thanks to Microsoft for keeping us on our toes.
 
