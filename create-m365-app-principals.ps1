@@ -45,7 +45,7 @@ $scopes = @(
     "Application.ReadWrite.All"
     "User.Read.All"
 )
-Connect-MgGraph -Scopes $scopes
+Connect-MgGraph -Scopes $scopes -NoWelcome
 Connect-ExchangeOnline
 
 # Some configuration
@@ -90,8 +90,8 @@ $secret = $ClientSecret2.SecretText
 $App = Get-MgApplication -ApplicationId $APPObjectID
 $App.PasswordCredentials
 
-Write-Host "Wait for MS to register app and principal"
-Start-Sleep -Seconds 10
+Write-Host "Wait for MS to register app and principal, we wait for an Minute as microsofts registration can take a while"
+Start-Sleep -Seconds 60
 
 # Create ServicePrincipal
 New-ServicePrincipal -appid $MgServicePrincipal.AppId -objectid $MgServicePrincipal.Id -DisplayName $appName
