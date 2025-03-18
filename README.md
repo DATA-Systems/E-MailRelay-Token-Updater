@@ -52,10 +52,6 @@ This can be done with two simple lines at the (Run-As-Administrator) command lin
     schtasks /create /sc MINUTE /mo 30 /ru System /rl HIGHEST /tn Update-XOauth-Token /tr "powershell.exe -File '<path to emailrelay-update-xoauth.ps1>'"
     schtasks /run /tn Update-XOauth-Token
 
-## Troble-Shooting
-
-If the script gives the error: "AADServicePrincipalNotFound" most likely Microsoft had not registrated the app when the script continued.
-
 ## Thank you
 
 We set this up because [E-MailRelay](https://emailrelay.sourceforge.net/) is our SMTP relay of choice, since Microsoft [dropped the SMTP services in Windows Server 2025](https://learn.microsoft.com/en-us/windows-server/get-started/removed-deprecated-features-windows-server). We are planning to use (and support) these scripts, as long as needed. We will gladly read (and most likely accept) PRs for patches, improvements and updates.
@@ -64,7 +60,3 @@ Thanks to the admins of [ugg.li](https://ugg.li) for their very friendly help an
 
 ## License
 Shall be used under [GPLv3](https://choosealicense.com/licenses/gpl-3.0/).
-
-## TODO
-
-- Check if the application is registrated and wait longer if not insted of just waiting an full minute

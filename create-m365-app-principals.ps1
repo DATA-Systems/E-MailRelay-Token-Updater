@@ -49,22 +49,24 @@ Connect-MgGraph -Scopes $scopes -NoWelcome
 Connect-ExchangeOnline
 
 # Some configuration
-$appName = "E-MailRelay"
+$appName = "E-MailRelay-Test"
 
 # Create APP
 $App = New-MgApplication -DisplayName $AppName
 
 # Get APP informations
 $APPObjectID = $App.Id
-Get-MgApplication -ApplicationId $APPObjectID
+Get-MgApplication -ApplicationId $APPObjectID | Out-Null
 
 # Store this for later
+Write-host "Create MgApplication"
 $AppID = Get-MgApplication -ApplicationId $APPObjectID | Select-Object -ExpandProperty AppId
 
 # Create Graph service prinzipal
 $params = @{
 	appId = $AppID
 }
+Write-host "Create MgServicePrinzipal"
 $MgServicePrincipal = New-MgServicePrincipal -BodyParameter $params
 
 # Add permissions and admin consent
@@ -76,36 +78,50 @@ $servicePrincipal = Get-EntraServicePrincipal -Filter "DisplayName eq '$appName'
 # Get application role ID
 $appRoleId = ($graphServicePrincipal.AppRoles | Where-Object { $_.Value -eq $applicationPermission }).Id
 
-New-EntraServicePrincipalAppRoleAssignment -ObjectId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -PrincipalId $servicePrincipal.Id
+Write-host "Set Permissions"
+New-EntraServicePrincipalAppRoleAssignment -ObjectId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -PrincipalId $servicePrincipal.Id | Out-Null
 
 # Add app secret
+$endDate = (Get-Date).AddMonths(+12)
 $passwordCred = @{
     "displayName" = $appName
-    "endDateTime" = (Get-Date).AddMonths(+12)
+    "endDateTime" = $endDate
 }
-$ClientSecret2 = Add-MgApplicationPassword -ApplicationId $APPObjectID -PasswordCredential $passwordCred
+Write-host "Create client secret, expiration: $endDate"
+$ClientSecret2 = Add-MgApplicationPassword -ApplicationId $APPObjectID -PasswordCredential $passwordCred | Out-Null
 $secret = $ClientSecret2.SecretText
 
 #Show ClientSecrets
 $App = Get-MgApplication -ApplicationId $APPObjectID
 $App.PasswordCredentials
 
-Write-Host "Wait for MS to register app and principal, we wait for an Minute as microsofts registration can take a while"
-Start-Sleep -Seconds 60
+$registered = $false
+while ($registered -eq $false) {
+    # Try to create ExchangeServicePrinzipal
+    $principal = New-ServicePrincipal -appid $MgServicePrincipal.AppId -objectid $MgServicePrincipal.Id -DisplayName $appName -erroraction 'silentlycontinue'
 
-# Create ServicePrincipal
-New-ServicePrincipal -appid $MgServicePrincipal.AppId -objectid $MgServicePrincipal.Id -DisplayName $appName
+    if ($principal -eq $null) {
+        Write-Host "Wait 5 seconds for Microsoft to register MgApplication and MgServicePrinzipal."
+        Start-Sleep -Seconds 5
+    } else {
+        Write-Host "ExchangeServicePrinzipal created."
+        $registered = $true
+    }
+}   
 
 # Add user permission
-Add-MailboxPermission -identity $upn -user $MgServicePrincipal.AppId -accessrights Fullacces
+Write-Host "Grant $upn access to the ExchangeServicePrinzipal"
+Add-MailboxPermission -identity $upn -user $MgServicePrincipal.AppId -accessrights Fullacces | Out-Null
 
 # Disconnect Graph
-Disconnect-MgGraph
+$DisconnectGraph = Disconnect-MgGraph
+$TenantID = $DisconnectGraph.TenantId
 
-# Disconnect
-Disconnect-ExchangeOnline
+# Disconnect ExchnagOnline
+Disconnect-ExchangeOnline -Confirm:$false
 
 Write-Host "--- Variables you will need ---"
+Write-Host "TennantID: $TenantID"
 Write-Host "AppID: $AppID"
 Write-Host "Client-Secret: $secret"
 
