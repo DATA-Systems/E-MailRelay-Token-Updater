@@ -1,6 +1,6 @@
 <#
 .EXAMPLE
-    .\create-m365-app-principals.ps1 test@domain.com
+    .\create-m365-app-principals.ps1 example@example.com
     This will create an new App with Permissions and an Exchange-Serviceprinzipal needed for emailrelay-update-xoauth.ps1.
     Also it prints out the AppID and Secret needed in emailrelay-update-xoauth.ps1.
 .INPUTS
@@ -9,6 +9,7 @@
 .OUTPUTS
   App(Client)-ID
   AppSecret
+  TennantID
 .NOTES
   Version:        0.1
   Author:         j.saslona@data-systems.de (Github: Jon1Games)
@@ -53,14 +54,11 @@ Connect-ExchangeOnline
 $appName = "E-MailRelay"
 
 # Create APP
+Write-host "Create MgApplication"
 $App = New-MgApplication -DisplayName $AppName
 
 # Get APP informations
 $APPObjectID = $App.Id
-Get-MgApplication -ApplicationId $APPObjectID | Out-Null
-
-# Store this for later
-Write-host "Create MgApplication"
 $AppID = Get-MgApplication -ApplicationId $APPObjectID | Select-Object -ExpandProperty AppId
 
 # Create Graph service prinzipal
