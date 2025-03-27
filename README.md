@@ -54,10 +54,11 @@ $AppSecret = ''
 ### 4. Set up scheduled task (for automatic token renewal)
 
 A scheduled task running `emailrelay-update-xoauth.ps1` (with pasted secrets) should be set up to run every ~45 minutes as the OAuth tokens have a lifetime of 60 minutes.
+Change the file path, in the example below we use out default location for the script.
 
 This can be done with two simple lines from the command line (as admin):
 ```
-schtasks /create /sc MINUTE /mo 30 /ru System /rl HIGHEST /tn Update-XOauth-Token /tr "powershell.exe -File '<path to emailrelay-update-xoauth.ps1>'"
+schtasks /create /sc MINUTE /mo 30 /ru System /rl HIGHEST /tn Update-XOauth-Token /tr "powershell.exe -File 'C:\ProgramData\E-MailRelay\emailrelay-update-xoauth.ps1'"
 schtasks /run /tn Update-XOauth-Token
 ```
 
