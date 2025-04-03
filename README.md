@@ -62,6 +62,12 @@ schtasks /create /sc MINUTE /mo 30 /ru System /rl HIGHEST /tn Update-XOauth-Toke
 schtasks /run /tn Update-XOauth-Token
 ```
 
+## Trouble shooting
+
+### Script can not be executed due to missing digital signature.
+
+Open the properties and click allow at security (at the bottom of file)
+
 ## Thank you
 
 We set this up because [E-MailRelay](https://emailrelay.sourceforge.net/) is our SMTP relay of choice, since Microsoft [dropped the SMTP services in Windows Server 2025](https://learn.microsoft.com/en-us/windows-server/get-started/removed-deprecated-features-windows-server).
