@@ -71,6 +71,7 @@ $AppSecret = ''
 > [!CAUTION]
 > Make sure the script is stored in a secure place with appropriate ACLs, as anyone with access to it can use it to request a valid authentication token and send mails as the configured mailbox.
 
+
 Ensure that E-MailRelay is set up to actually use the [authentication](https://emailrelay.sourceforge.net/index.html#reference_md_Authentication) config file via the `client-auth` parameter (either as part of the command line or in the `emailrelay.cfg` file).
 
 ### 4. Set up scheduled task (for automatic token renewal)
@@ -82,6 +83,12 @@ The second line immediately runs the task to update the E-MailRelay config with 
 schtasks /create /sc MINUTE /mo 45 /ru System /rl HIGHEST /tn Update-E-MailRelay-OAuth-Token /tr "powershell.exe -File '<path to emailrelay-update-xoauth.ps1>'"
 schtasks /run /tn Update-E-MailRelay-OAuth-Token
 ```
+
+## Trouble shooting
+
+### Script can not be executed due to missing digital signature.
+
+Open the properties and click allow at security (at the bottom of file)
 
 ## Thank you
 We set this up because E-MailRelay is our SMTP relay of choice since Microsoft [removed the SMTP services in Windows Server 2025](https://learn.microsoft.com/en-us/windows-server/get-started/removed-deprecated-features-windows-server?tabs=ws25#features-removed).

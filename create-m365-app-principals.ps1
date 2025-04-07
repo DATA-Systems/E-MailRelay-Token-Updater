@@ -48,7 +48,7 @@ Import-Module -Name Microsoft.Entra.Authentication
 Import-Module -Name Microsoft.Entra.Applications
 Import-Module -Name ExchangeOnlineManagement
 
-Write-Host "Connect to Entra..."
+Write-Host "Connecting to Entra PowerShell..."
 # Comnnect to Entra
 Connect-Entra -NoWelcome
 
