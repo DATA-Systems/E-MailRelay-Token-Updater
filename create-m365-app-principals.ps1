@@ -1,126 +1,114 @@
 <#
+.SYNOPSIS
+    This script sets up a new Entra ID app, service principal and Exchange Online service principal with permissions to send mails as a given UserMailbox.
+    It will then return the ID and secret values needed for emailrelay-update-xoauth.ps1.
 .EXAMPLE
-    .\create-m365-app-principals.ps1 example@example.com
-    This will create an new App with Permissions and an Exchange-Serviceprinzipal needed for emailrelay-update-xoauth.ps1.
-    Also it prints out the AppID and Secret needed in emailrelay-update-xoauth.ps1.
+    PS> .\create-m365-app-principals.ps1 -UserPrincipalName test@example.com
 .INPUTS
-  UPN (Username) that need to auth with XOAuth2
-  2x Promt for M365 login
+    UserPrincipalName for the mailbox that will be used to authenticate via SMTP XOAUTH2
+    2x Prompt for administrative M365 login (Entra and ExchangeOnlineManagement PowerShell connectivity)
 .OUTPUTS
-  App(Client)-ID
-  AppSecret
-  TennantID
+    Tenant ID, app ID and client secret
+.LINK
+    https://github.com/DATA-Systems/E-MailRelay-Token-Updater
 .NOTES
-  Version:        0.1
-  Author:         j.saslona@data-systems.de (Github: Jon1Games)
-  Creation Date:  2025-03-17
+    Version:    0.2
+    Author:	    j.saslona@data-systems.de (GitHub: Jon1Games), j.tueselmann@data-systems.de (GitHub: iSnackyCracky)
+    References:
+        - https://learn.microsoft.com/en-us/powershell/entra-powershell/manage-apps?view=entra-powershell
+        - https://learn.microsoft.com/en-us/powershell/entra-powershell/create-custom-application?view=entra-powershell&tabs=application&pivots=powershell
+        - https://github.com/microsoftgraph/entra-powershell/blob/main/samples/create-custom-app-with-delegated-permissions.ps1
 #>
 
-# Get args
-param ($upn)
-if ($upn -eq $null) {
-    $upn = read-host -Prompt "Please enter UPN (Username), this is the user which can auth with the App" 
-}
+#Requires -Modules Microsoft.Entra.Authentication, Microsoft.Entra.Applications, ExchangeOnlineManagement
 
-Write-Host "Check if modules are installed, if not install."
+param (
+    [Parameter(Mandatory=$true,
+               Position=0,
+               HelpMessage="UserPrincipalName of the user that authenticates using the app")]
+    [Alias("UPN")]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $UserPrincipalName,
 
-# Install the modules if not installed
-Write-Host "processing: Microsoft.Graph.Authentication"
-Install-Module Microsoft.Graph.Authentication
-Write-Host "processing: Microsoft.Graph.Applications"
-Install-Module Microsoft.Graph.Applications
-Write-Host "processing: Microsoft.Entra"
-Install-Module Microsoft.Entra
-Write-Host "processing: ExchangeOnlineManagement"
-Install-Module ExchangeOnlineManagement
+    [Parameter(Position=1,
+               HelpMessage="Name of the Entra ID application")]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $AppName = "E-MailRelay",
+
+    [Parameter(Position=2,
+               HelpMessage="Lifetime of the created client secret in months")]
+    [int]
+    $ClientSecretLifetimeMonths = 120
+)
 
 # Import modules
-Import-Module Microsoft.Graph.Authentication
-Import-Module Microsoft.Graph.Applications
-Import-Module Microsoft.Entra
-Import-Module ExchangeOnlineManagement
+Import-Module -Name Microsoft.Entra.Authentication
+Import-Module -Name Microsoft.Entra.Applications
+Import-Module -Name ExchangeOnlineManagement
 
-# Comnnect to graph and ExchangeOnline
-Write-Host "Connect to MgGraph and ExchangeOnline"
-$scopes = @(
-    "Application.Read.All"
-    "Application.ReadWrite.All"
-    "User.Read.All"
-)
-Connect-MgGraph -Scopes $scopes -NoWelcome
-Connect-ExchangeOnline
+Write-Host "Connecting to Entra PowerShell..."
+# Comnnect to Entra
+Connect-Entra -NoWelcome
 
-# Some configuration
-$appName = "E-MailRelay"
+Write-Host "Creating Entra App..."
+# Create app and service principal
+$app = New-EntraApplication -DisplayName $AppName
+$servicePrincipal = New-EntraServicePrincipal -AppId $app.AppId
 
-# Create APP
-Write-host "Create MgApplication"
-$App = New-MgApplication -DisplayName $AppName
-
-# Get APP informations
-$APPObjectID = $App.Id
-$AppID = Get-MgApplication -ApplicationId $APPObjectID | Select-Object -ExpandProperty AppId
-
-# Create Graph service prinzipal
-$params = @{
-	appId = $AppID
-}
-Write-host "Create MgServicePrinzipal"
-$MgServicePrincipal = New-MgServicePrincipal -BodyParameter $params
-
-# Add permissions and admin consent
+# Add required application api permissions
 $applicationPermission = 'SMTP.SendAsApp'
 $graphApiId = '00000002-0000-0ff1-ce00-000000000000'
 $graphServicePrincipal = Get-EntraServicePrincipal -Filter "AppId eq '$graphApiId'"
-$servicePrincipal = Get-EntraServicePrincipal -Filter "DisplayName eq '$appName'"
 
-# Get application role ID
+Write-Host "Setting Entra App API permissions..."
+# Create resource access object
+$resourceAccess = New-Object Microsoft.Open.MSGraph.Model.ResourceAccess
+$resourceAccess.Id = ((Get-EntraServicePrincipal -ServicePrincipalId $graphServicePrincipal.Id).AppRoles | Where-Object { $_.Value -eq $applicationPermission}).Id
+$resourceAccess.Type = 'Role'
+
+# Create required resource access object
+$requiredResourceAccess = New-Object Microsoft.Open.MSGraph.Model.RequiredResourceAccess
+$requiredResourceAccess.ResourceAppId = $graphApiId
+$requiredResourceAccess.ResourceAccess = $resourceAccess
+
+# Set application required resource access
+Set-EntraApplication -ApplicationId $app.Id -RequiredResourceAccess $requiredResourceAccess
+
+# Assign API permissions to the service principal
 $appRoleId = ($graphServicePrincipal.AppRoles | Where-Object { $_.Value -eq $applicationPermission }).Id
+New-EntraServicePrincipalAppRoleAssignment -PrincipalId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -ServicePrincipalId $servicePrincipal.Id | Out-Null
 
-Write-host "Set Permissions"
-New-EntraServicePrincipalAppRoleAssignment -ObjectId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -PrincipalId $servicePrincipal.Id | Out-Null
+Write-Host "Creating client secret..."
+# Create client secret
+$passCred = New-Object Microsoft.Open.MSGraph.Model.PasswordCredential
+$passCred.EndDateTime = (Get-Date).AddMonths($ClientSecretLifetimeMonths)
+$passCred.DisplayName = "$AppName secret"
+$appPassword = New-EntraApplicationPassword -ApplicationId $app.Id -PasswordCredential $passCred
 
-# Add app secret
-$endDate = (Get-Date).AddMonths(+121)
-$passwordCred = @{
-    "displayName" = $appName
-    "endDateTime" = $endDate
-}
-Write-host "Create client secret, expiration: $endDate"
-$ClientSecret2 = Add-MgApplicationPassword -ApplicationId $APPObjectID -PasswordCredential $passwordCred
-$secret = $ClientSecret2.SecretText
+Write-Host "Connecting ExchangeOnline PowerShell..."
+# Connect to ExchangeOnline
+Connect-ExchangeOnline -ShowBanner:$false
 
-#Show ClientSecrets
-$App = Get-MgApplication -ApplicationId $APPObjectID
+Write-Host "Setting Exchange Service-Principal permissions on Mailbox $UserPrincipalName..."
+# Manage Exchange Online permissions
+$exoServicePrincipal = New-ServicePrincipal -AppId $servicePrincipal.AppId -ObjectId $servicePrincipal.Id -DisplayName $AppName
+Add-MailboxPermission -AccessRights FullAccess -Identity $UserPrincipalName -User $exoServicePrincipal.ObjectId | Out-Null
 
-$registered = $false
-while ($registered -eq $false) {
-    # Try to create ExchangeServicePrinzipal
-    $principal = New-ServicePrincipal -appid $MgServicePrincipal.AppId -objectid $MgServicePrincipal.Id -DisplayName $appName -erroraction 'silentlycontinue'
-
-    if ($principal -eq $null) {
-        Write-Host "Wait 5 seconds for Microsoft to register MgApplication and MgServicePrinzipal."
-        Start-Sleep -Seconds 5
-    } else {
-        Write-Host "ExchangeServicePrinzipal created."
-        $registered = $true
-    }
-}   
-
-# Add user permission
-Write-Host "Grant $upn access to the ExchangeServicePrinzipal"
-Add-MailboxPermission -identity $upn -user $MgServicePrincipal.AppId -accessrights Fullacces | Out-Null
-
-# Disconnect Graph
-$DisconnectGraph = Disconnect-MgGraph
-$TenantID = $DisconnectGraph.TenantId
-
-# Disconnect ExchnagOnline
+# Disconnect modules
+$entraSession = Disconnect-Entra
 Disconnect-ExchangeOnline -Confirm:$false
 
-Write-Host "--- Variables you will need ---"
-Write-Host "TennantID: $TenantID"
-Write-Host "AppID: $AppID"
-Write-Host "Client-Secret: $secret"
-
-exit
+# Display required output values
+$checkmark = [char]0x2705
+$exclamation = [char]0x26a0
+Write-Host "$checkmark DONE!"
+Write-Host
+Write-Host "$exclamation  Variables you will need $exclamation"
+Write-Host "Tenant ID:     " -NoNewLine
+Write-Host $entraSession.TenantId -ForegroundColor Cyan
+Write-Host "App ID:        " -NoNewLine
+Write-Host $app.AppId -ForegroundColor Cyan
+Write-Host "Client-Secret: " -NoNewLine
+Write-Host $appPassword.SecretText -ForegroundColor Cyan
