@@ -20,6 +20,8 @@
         - https://github.com/microsoftgraph/entra-powershell/blob/main/samples/create-custom-app-with-delegated-permissions.ps1
 #>
 
+#Requires -Modules Microsoft.Entra.Authentication, Microsoft.Entra.Applications, ExchangeOnlineManagement
+
 param (
     [Parameter(Mandatory=$true,
                Position=0,
@@ -41,22 +43,16 @@ param (
     $ClientSecretLifetimeMonths = 120
 )
 
-Write-Host "Check if modules are installed, if not install."
-
-# Install the modules if not installed
-Write-Host "processing: Microsoft.Entra"
-Install-Module Microsoft.Entra
-Write-Host "processing: ExchangeOnlineManagement"
-Install-Module ExchangeOnlineManagement
-
 # Import modules
-Import-Module Microsoft.Entra
-Import-Module ExchangeOnlineManagement
+Import-Module -Name Microsoft.Entra.Authentication
+Import-Module -Name Microsoft.Entra.Applications
+Import-Module -Name ExchangeOnlineManagement
 
-# Comnnect to graph and ExchangeOnline
-Write-Host "Connect to MgGraph and ExchangeOnline"
-Connect-ExchangeOnline
+Write-Host "Connect to Entra..."
+# Comnnect to Entra
+Connect-Entra -NoWelcome
 
+Write-Host "Creating Entra App..."
 # Create app and service principal
 $app = New-EntraApplication -DisplayName $AppName
 $servicePrincipal = New-EntraServicePrincipal -AppId $app.AppId
@@ -66,6 +62,7 @@ $applicationPermission = 'SMTP.SendAsApp'
 $graphApiId = '00000002-0000-0ff1-ce00-000000000000'
 $graphServicePrincipal = Get-EntraServicePrincipal -Filter "AppId eq '$graphApiId'"
 
+Write-Host "Setting Entra App API permissions..."
 # Create resource access object
 $resourceAccess = New-Object Microsoft.Open.MSGraph.Model.ResourceAccess
 $resourceAccess.Id = ((Get-EntraServicePrincipal -ServicePrincipalId $graphServicePrincipal.Id).AppRoles | Where-Object { $_.Value -eq $applicationPermission}).Id
@@ -81,23 +78,37 @@ Set-EntraApplication -ApplicationId $app.Id -RequiredResourceAccess $requiredRes
 
 # Assign API permissions to the service principal
 $appRoleId = ($graphServicePrincipal.AppRoles | Where-Object { $_.Value -eq $applicationPermission }).Id
-New-EntraServicePrincipalAppRoleAssignment -PrincipalId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -ServicePrincipalId $servicePrincipal.Id
+New-EntraServicePrincipalAppRoleAssignment -PrincipalId $servicePrincipal.Id -ResourceId $graphServicePrincipal.Id -Id $appRoleId -ServicePrincipalId $servicePrincipal.Id | Out-Null
 
+Write-Host "Creating client secret..."
 # Create client secret
 $passCred = New-Object Microsoft.Open.MSGraph.Model.PasswordCredential
 $passCred.EndDateTime = (Get-Date).AddMonths($ClientSecretLifetimeMonths)
 $passCred.DisplayName = "$AppName secret"
 $appPassword = New-EntraApplicationPassword -ApplicationId $app.Id -PasswordCredential $passCred
 
+Write-Host "Connecting ExchangeOnline PowerShell..."
+# Connect to ExchangeOnline
+Connect-ExchangeOnline -ShowBanner:$false
+
+Write-Host "Setting Exchange Service-Principal permissions on Mailbox $UserPrincipalName..."
 # Manage Exchange Online permissions
 $exoServicePrincipal = New-ServicePrincipal -AppId $servicePrincipal.AppId -ObjectId $servicePrincipal.Id -DisplayName $AppName
-Add-RecipientPermission -AccessRights SendAs -Identity $UserPrincipalName -Trustee $exoServicePrincipal.ObjectId
+Add-MailboxPermission -AccessRights FullAccess -Identity $UserPrincipalName -User $exoServicePrincipal.ObjectId | Out-Null
 
 # Disconnect modules
 $entraSession = Disconnect-Entra
 Disconnect-ExchangeOnline -Confirm:$false
 
-Write-Host "--- Variables you will need ---"
-Write-Host "Tennant ID: $( $entraSession.TenantId )"
-Write-Host "App ID: $( $app.AppId )"
-Write-Host "Client-Secret: $( $appPassword.SecretText )"
+# Display required output values
+$checkmark = [char]0x2705
+$exclamation = [char]0x26a0
+Write-Host "$checkmark DONE!"
+Write-Host
+Write-Host "$exclamation  Variables you will need $exclamation"
+Write-Host "Tenant ID:     " -NoNewLine
+Write-Host $entraSession.TenantId -ForegroundColor Cyan
+Write-Host "App ID:        " -NoNewLine
+Write-Host $app.AppId -ForegroundColor Cyan
+Write-Host "Client-Secret: " -NoNewLine
+Write-Host $appPassword.SecretText -ForegroundColor Cyan
