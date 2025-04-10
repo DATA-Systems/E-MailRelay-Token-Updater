@@ -49,8 +49,8 @@ Import-Module -Name Microsoft.Entra.Applications
 Import-Module -Name ExchangeOnlineManagement
 
 Write-Host "Connecting to Entra PowerShell..."
-# Comnnect to Entra
-Connect-Entra -NoWelcome
+# Comnnect to Entra (explicitly request the Application.ReadWrite.All scope to make sure the connection obtains required permissions)
+Connect-Entra -NoWelcome -Scopes 'Application.ReadWrite.All'
 
 Write-Host "Creating Entra App..."
 # Create app and service principal
