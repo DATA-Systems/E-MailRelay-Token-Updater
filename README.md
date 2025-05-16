@@ -5,13 +5,29 @@ This basically extends E-MailRelay to be useable as a silent but powerful Micros
 ## Installation
 
 ### 1. Setup
-Download one or both script(s) as needed:
 
-#### `create-m365-app-principals.ps1`
-Assists you in creating the required Entra ID application with appropiate permissions for sending E-Mails.
+You need to install the Microsoft Entra PowerShell module(s):
 
-#### `emailrelay-update-xoauth.ps1`
-Retrieves the actual authentication tokens and writes them to the E-MailRelay configuration file for use during SMTP authentication. Needs to be run regularly (i.e. as a scheduled task).
+`PS C:\> PSInstall-Module -Name Microsoft.Entra -AllowClobber`
+
+> [!NOTE]
+> Administrative rights may be needed, depending on your configuration.
+
+Then, download or clone one or both script(s):
+
+#### create-m365-app-principals.ps1
+
+Assists you in creating the required Entra ID application with appropiate permissions for sending E-Mails
+
+`PS C:\> curl.exe -L https://github.com/DATA-Systems/E-MailRelay-Token-Updater/raw/refs/heads/main/create-m365-app-principals.ps1 > create-m365-app-principals.ps1`
+
+#### emailrelay-update-xoauth.ps1
+
+Retrieves the actual authentication tokens and writes them to the E-MailRelay configuration file for use during SMTP authentication. Needs to be run regularly (i.e. as a scheduled task)
+
+`PS C:\> curl.exe -L https://github.com/DATA-Systems/E-MailRelay-Token-Updater/raw/refs/heads/main/emailrelay-update-xoauth.ps1 > emailrelay-update-xoauth.ps1`
+
+<br />
 
 > [!NOTE]
 > After downloading, make sure to unblock the files either by using the [Unblock-File](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/unblock-file) PowerShell cmdlet or by manually unblocking it via the file properties using the Explorer.
