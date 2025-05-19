@@ -11,7 +11,9 @@ You need to install the Microsoft Entra PowerShell module(s):
 `PS C:\> PSInstall-Module -Name Microsoft.Entra -AllowClobber`
 
 > [!NOTE]
-> Administrative rights may be needed, depending on your configuration.
+> * Administrative rights may be needed, depending on your configuration
+> * Depending on your PowerShell edition (core/destkop/windows) and Version you might need different Versions of the ExchangeOnlineManagement
+> * We have noticed, the current release v3.7.2 doesn't work in Windows PowerShell v5.1. It requires PowerShell (formerly known as PowerShell Core) [version 7](https://learn.microsoft.com/de-de/powershell/scripting/install/installing-powershell-on-windows?view=powershell-7.5#install-powershell-using-winget-recommended) or newer instead.
 
 Then, download or clone one or both script(s):
 
@@ -37,15 +39,6 @@ Retrieves the actual authentication tokens and writes them to the E-MailRelay co
 There are two ways this can be done. [Manually](https://learn.microsoft.com/en-us/entra/identity-platform/quickstart-register-app) or automatically using the `create-m365-app-principals.ps1` script.
 
 We recommend using `create-m365-app-principals.ps1` to create the app, client secrets and Exchange Online service principals with their appropriate permissions.
-
-The script requires at least the following PowerShell Modules:
-- [Microsoft.Entra](https://learn.microsoft.com/en-us/powershell/entra-powershell/installation).Authentication
-- Microsoft.Entra.Applications
-- [ExchangeOnlineManagement](https://learn.microsoft.com/de-de/powershell/exchange/exchange-online-powershell-v2)
-
-> [!NOTE]
-> Depending on your PowerShell edition (core or destkop/windows) and Version you might need different Versions of the ExchangeOnlineManagement.
-> We've noticed the currently available 3.7.2 Version doesn't work in Windows PowerShell (5.1) and instead requires PowerShell (formerly known as PowerShell Core) version 7 or newer.
 
 When running the Script, provide the mailbox in whose name you want to send mails using the `-UserPrincipalName` parameter.
 
