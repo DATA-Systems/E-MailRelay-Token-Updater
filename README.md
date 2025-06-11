@@ -8,7 +8,7 @@ This basically extends E-MailRelay to be useable as a silent but powerful Micros
 
 You need to install the Microsoft Entra PowerShell module(s):
 
-`PS C:\> PSInstall-Module -Name Microsoft.Entra -AllowClobber`
+`PS C:\> Install-Module -Name Microsoft.Entra -AllowClobber`
 
 > [!NOTE]
 > * Administrative rights may be needed, depending on your configuration
