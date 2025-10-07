@@ -88,7 +88,16 @@ $AppSecret = ''
 
 Ensure that E-MailRelay is set up to actually use the [authentication](https://emailrelay.sourceforge.net/index.html#reference_md_Authentication) config file via the `client-auth` parameter (either as part of the command line or in the `emailrelay.cfg` file).
 
-### 4. Set up scheduled task (for automatic token renewal)
+### 4. Adjust settings of E-MailRelay
+Make sure to uncomment the following line in the `emailrelay.cfg` to use the authentication token that will be written there from the `E-Mail-Token-Updater.ps1` script.
+```
+client-auth C:\ProgramData\E-MailRelay\emailrelay.auth
+```
+> [!NOTE]
+> If the `emailrelay.auth` file elready exists make sure that the only uncommented line starts with `client oauth:b <UserPrinzipalName>`.<br>
+> If the file does not exists yet, the `E-Mail-Token-Updater.ps1` script will create it for you.
+
+### 5. Set up scheduled task (for automatic token renewal)
 To ensure OAuth tokens are renewed before their lifetime expires (60 minutes), you should set up a scheduled task to run the `emailrelay-update-xoauth.ps1` script every ~45-55 minutes.
 
 This example sets up a scheduled task named "Update-E-MailRelay-OAuth-Token" to run the script as NT-AUTHORITY\SYSTEM every 45 minutes.
