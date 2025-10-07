@@ -6,9 +6,10 @@ This basically extends E-MailRelay to be useable as a silent but powerful Micros
 
 ### 1. Setup
 
-You need to install the Microsoft Entra PowerShell module(s):
+You need to install the Microsoft Entra and Exchange Online Management PowerShell module(s):
 
 `PS C:\> Install-Module -Name Microsoft.Entra -AllowClobber`
+`PS C:\> Install-Module -Name ExchangeOnlineManagement -AllowClobber`
 
 > [!NOTE]
 > * Administrative rights may be needed, depending on your configuration
@@ -46,6 +47,9 @@ When running the Script, provide the mailbox in whose name you want to send mail
 > You can specify a different client secret lifetime using the `-ClientSecretLifetimeMonths` parameter. (default: _120_ months)
 > 
 > Likewise using the `-AppName` parameter, you can change the Entra ID application name. (default: _E-MailRelay_), 
+
+# Example
+`PS C:\Program Files\E-MailRelay> .\create-m365-app-principals.ps1 -ClientSecretLifetimeMonths 20 -UserPrincipalName mail@exmaple.com`
 
 You will then be prompted to log in two times. You will need a user with appropriate administrative permissions for this.
 The first login is required for authenticating to Microsoft Entra using the Microsoft.Entra.* modules, the second login is needed for managing ExchangeOnline permissions using the ExchangeOnlineManagement module.
