@@ -51,7 +51,7 @@ When running the Script, provide the mailbox in whose name you want to send mail
 #### Example
 `PS C:\Program Files\E-MailRelay> .\create-m365-app-principals.ps1 -ClientSecretLifetimeMonths 20 -UserPrincipalName mail@exmaple.com`
 
-You will then be prompted to log in two times. You will need a user with appropriate administrative permissions for this. The first login is required for authenticating to Microsoft Entra using the Microsoft.Entra.* modules, the second login is needed for managing ExchangeOnline permissions using the ExchangeOnlineManagement module.
+You will then be prompted to log in two times. You will need a user with administrative permissions for this. The first login is required for authenticating to Microsoft Entra using the Microsoft.Entra.* modules, the second login is needed for managing ExchangeOnline permissions using the ExchangeOnlineManagement module.
 
 Microsoft Internet Explorer (IE) "Protected Mode" has to be turned off, for the modern authentication window to work properly. Default is "off" on Windows Server, which can be changed in "Server Manager" app.
 
