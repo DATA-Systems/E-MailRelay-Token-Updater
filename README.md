@@ -48,7 +48,7 @@ When running the Script, provide the mailbox in whose name you want to send mail
 > 
 > Likewise using the `-AppName` parameter, you can change the Entra ID application name. (default: _E-MailRelay_), 
 
-# Example
+#### Example
 `PS C:\Program Files\E-MailRelay> .\create-m365-app-principals.ps1 -ClientSecretLifetimeMonths 20 -UserPrincipalName mail@exmaple.com`
 
 You will then be prompted to log in two times. You will need a user with appropriate administrative permissions for this.
