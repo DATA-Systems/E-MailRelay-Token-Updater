@@ -56,8 +56,8 @@ $saslXOAuth2 = [Convert]::ToBase64String($saslXOAuth2Bytes)
 
 # Append the client oauth line to the E-Mailrelay auth file.
 # If it already exists, replace the existing token with the new one.
-$emailrelayClientOauth = "client oauth:b test"
-$emailrelayAuthConfig = "$emailrelayClientOauth TEST_BASE64_ENCODED_XOAUTH2_TOKEN"
+$emailrelayClientOauth = "client oauth:b $username"
+$emailrelayAuthConfig = "$emailrelayClientOauth $saslXOAuth2"
 
 if (Test-Path $AuthFile) {
     $line = Get-Content $AuthFile | Select-String $emailrelayClientOauth | Select-Object -ExpandProperty Line
